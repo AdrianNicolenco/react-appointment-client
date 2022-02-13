@@ -43,6 +43,7 @@ const Login = (props) => {
 
     }) 
     : await props.customerLogin(newObject).then(res => {
+      console.log(res);
       if(res.status === 400 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
       if(res.status === 200 ) {enqueueSnackbar("Successfully Login", {variant: 'success', autoHideDuration: 1000})
       setTimeout(()=>{

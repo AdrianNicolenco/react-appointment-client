@@ -1,4 +1,4 @@
-import { Login } from "./types";
+import { LOGIN } from "./types";
 import axios from 'axios';
 
 export const customerSignUp = (object) => async(dispatch) => {
@@ -25,6 +25,10 @@ export const customerLogin = (object) => async(dispatch) => {
     }).catch((err) => {
         return err.response;
     });
+    dispatch({
+        type: LOGIN,
+        payload: result.data
+    })
     return result;
 }
 
@@ -34,5 +38,9 @@ export const businessLogin = (object) => async(dispatch) => {
     }).catch((err) => {
         return err.response;
     });
+    dispatch({
+        type: LOGIN,
+        payload: result.data
+    })
     return result;
 }
