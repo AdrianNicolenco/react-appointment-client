@@ -27,7 +27,6 @@ import AdapterMoment from '@mui/lab/AdapterMoment';
 import Button from '@mui/material/Button';
 import Fab from '@mui/material/Fab';
 import IconButton from '@mui/material/IconButton';
-import AddIcon from '@mui/icons-material/Add';
 import TextField from '@mui/material/TextField';
 import Close from '@mui/icons-material/Close';
 import CalendarToday from '@mui/icons-material/CalendarToday';
@@ -152,7 +151,6 @@ class AppointmentFormContainerBasic extends React.PureComponent {
       target,
       onHide,
       postCommitChange,
-      commitDeletedAppointment
     } = this.props;
     const { appointmentChanges } = this.state;
 
@@ -246,10 +244,9 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                   postCommitChange('delete', displayAppointmentData);
                   visibleChange();
                   this.commitAppointment('deleted');
-                  commitDeletedAppointment();
                 }}
               >
-                Delete
+                Remove
               </Button>
             )}
             <Button
@@ -262,7 +259,7 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                 applyChanges();
               }}
             >
-              {isNewAppointment ? 'Create' : 'Save'}
+              {isNewAppointment ? 'Create' : 'Accept'}
             </Button>
           </div>
         </StyledDiv>
@@ -271,6 +268,7 @@ class AppointmentFormContainerBasic extends React.PureComponent {
   }
 }
 
+
 /* eslint-disable-next-line react/no-multi-comp */
 export default class Demo extends React.PureComponent {
   constructor(props) {
@@ -278,6 +276,7 @@ export default class Demo extends React.PureComponent {
     this.state = {
       data: props.data,
       currentDate: `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,
+      confirmationVisible: false,
       editingFormVisible: false,
       deletedAppointmentId: undefined,
       editingAppointment: undefined,
@@ -302,12 +301,13 @@ export default class Demo extends React.PureComponent {
       ]   
     };
 
+    this.toggleConfirmationVisible = this.toggleConfirmationVisible.bind(this);
     this.commitDeletedAppointment = this.commitDeletedAppointment.bind(this);
     this.toggleEditingFormVisibility = this.toggleEditingFormVisibility.bind(this);
-    
     this.commitChanges = this.commitChanges.bind(this);
     this.onEditingAppointmentChange = this.onEditingAppointmentChange.bind(this);
     this.onAddedAppointmentChange = this.onAddedAppointmentChange.bind(this);
+
     this.appointmentForm = connectProps(AppointmentFormContainerBasic, () => {
       const {
         editingFormVisible,
@@ -337,7 +337,6 @@ export default class Demo extends React.PureComponent {
         postCommitChange: this.props.postCommitChange,
         visibleChange: this.toggleEditingFormVisibility,
         onEditingAppointmentChange: this.onEditingAppointmentChange,
-        commitDeletedAppointment:this.commitDeletedAppointment,
         cancelAppointment,
       };
     });
@@ -373,14 +372,19 @@ export default class Demo extends React.PureComponent {
     });
   }
 
+  toggleConfirmationVisible() {
+    const { confirmationVisible } = this.state;
+    this.setState({ confirmationVisible: !confirmationVisible });
+  }
+
   commitDeletedAppointment() {
-    
     this.setState((state) => {
       const { data, deletedAppointmentId } = state;
       const nextData = data.filter(appointment => appointment.id !== deletedAppointmentId);
 
       return { data: nextData, deletedAppointmentId: null };
     });
+    this.toggleConfirmationVisible();
   }
 
   commitChanges({ added, changed, deleted }) {
@@ -396,6 +400,7 @@ export default class Demo extends React.PureComponent {
       }
       if (deleted !== undefined) {
         this.setDeletedAppointmentId(deleted);
+        this.toggleConfirmationVisible();
       }
       return { data, addedAppointment: {} };
     });
@@ -433,7 +438,13 @@ export default class Demo extends React.PureComponent {
           <WeekView
             startDayHour={startDayHour}
             endDayHour={endDayHour}
-          />
+            onDoubleClick={undefined}
+          >
+            <WeekView.TimeTableCell
+              onDoubleClick={undefined}
+            />
+            </WeekView>
+          
            <DayView
             startDayHour={startDayHour}
             endDayHour={endDayHour}
@@ -460,16 +471,6 @@ export default class Demo extends React.PureComponent {
           />
           <DragDropProvider />
         </Scheduler>
-
-        <StyledFab
-          color="secondary"
-          className={classes.addButton}
-          onClick={() => {
-            this.props.addFunc();
-          }}
-        >
-          <AddIcon />
-        </StyledFab>
       </Paper>
       </React.Fragment>
     );

@@ -1,10 +1,11 @@
-import { LOGIN, BUSINESS_INFO_ARRAY, BUSINESS_EMAIL, GET_BUSINESS_APPOINTMENT } from '../actions/types';
+import { LOGIN, BUSINESS_INFO_ARRAY, BUSINESS_EMAIL, GET_BUSINESS_APPOINTMENT, GET_CUSTOMER_APPOINTMENT } from '../actions/types';
 
 const initState = {
     userInfo:{},
     businessInfoArray:{},
     businessEmail:'',
     businessAppointment:{},
+    customerAppointment:{},
 }
 
 export default (state = initState, actions) => {
@@ -17,6 +18,8 @@ export default (state = initState, actions) => {
             return {...state, businessEmail:actions.payload}
         case GET_BUSINESS_APPOINTMENT:
             return {...state, businessAppointment:actions.payload}
+        case GET_CUSTOMER_APPOINTMENT:
+            return {...state, customerAppointment:actions.payload}
         default:
             return state;
     }

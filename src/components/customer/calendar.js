@@ -30,8 +30,6 @@ import LocationOn from '@mui/icons-material/LocationOn';
 import Close from '@mui/icons-material/Close';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import Create from '@mui/icons-material/Create';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 
 const PREFIX = 'Demo';
 
@@ -399,7 +397,6 @@ export default class AddCalendar extends React.PureComponent {
             defaultCurrentDate={currentDate}
           />
           <EditingState
-            preCommitChanges={this.onAppointmentUpdating}
             onCommitChanges={this.commitChanges}
             onEditingAppointmentChange={this.onEditingAppointmentChange}
             onAddedAppointmentChange={this.onAddedAppointmentChange}
@@ -437,7 +434,7 @@ export default class AddCalendar extends React.PureComponent {
           color="secondary"
           className={classes.addButton}
           onClick={() => {
-            console.log("SDF");
+            this.props.retFunc();
           }}
         >
           <AddIcon />

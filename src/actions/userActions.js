@@ -1,4 +1,10 @@
-import { LOGIN, BUSINESS_INFO_ARRAY, BUSINESS_EMAIL, GET_BUSINESS_APPOINTMENT } from "./types";
+import {
+  LOGIN,
+  BUSINESS_INFO_ARRAY,
+  BUSINESS_EMAIL,
+  GET_BUSINESS_APPOINTMENT,
+  GET_CUSTOMER_APPOINTMENT,
+} from "./types";
 import axios from "axios";
 
 export const customerSignUp = (object) => async (dispatch) => {
@@ -24,6 +30,7 @@ export const businessSignUp = (object) => async (dispatch) => {
 };
 
 export const customerLogin = (object) => async (dispatch) => {
+  console.log(object);
   const result = await axios
     .post("http://localhost:3001/customer/login", {
       object,
@@ -57,10 +64,13 @@ export const businessLogin = (object) => async (dispatch) => {
 
 export const getBusinessInfoArray = (object) => async (dispatch) => {
   const result = await axios
-    .get("http://localhost:3001/business/")
+    .get("http://localhost:3001/business/", {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
     .catch((err) => {
       return err.response;
     });
+    console.log(result);
   dispatch({
     type: BUSINESS_INFO_ARRAY,
     payload: result.data,
@@ -75,9 +85,10 @@ export const setBusinessEmail = (email) => (dispatch) => {
   });
 };
 
-export const postAppointments = (object) => async(dispatch) => {
+export const postAppointments = (object) => async (dispatch) => {
   const result = await axios
-    .post("http://localhost:3000/appointment/", {
+    .post("http://localhost:3001/appointment/", {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
       object,
     })
     .catch((err) => {
@@ -86,54 +97,159 @@ export const postAppointments = (object) => async(dispatch) => {
   return result;
 };
 
-export const getBusinessAppointment = (id) => async(dispatch) => {
+export const getBusinessAppointment = (id) => async (dispatch) => {
   const result = await axios
-    .get(`http://localhost:3001/business/${id}`)
+    .get(`http://localhost:3001/business/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
     .catch((err) => {
       return err.response;
     });
-    const data = result.data.appointment;
-    const appointmentArray = [];
-    data.forEach((value) => {
-      var newObject = {
-        startDate:value.starttime,
-        endDate:value.endtime,
-        location: 'Room 1',
-        //title:value.title,
-        //classNames:'disabled',
-        disabled: true,
-      };
-      appointmentArray.push(newObject);
-    })
-    dispatch({
-      type: GET_BUSINESS_APPOINTMENT,
-      payload: appointmentArray,
-    });
-    return result;
-}
+  const data = result.data.appointment;
+  const appointmentArray = [];
+  data.forEach((value) => {
+    var newObject = {
+      startDate: value.starttime,
+      endDate: value.endtime,
+      location: "Room 1",
+      //title:value.title,
+      //classNames:'disabled',
+      disabled: true,
+    };
+    appointmentArray.push(newObject);
+  });
+  dispatch({
+    type: GET_BUSINESS_APPOINTMENT,
+    payload: appointmentArray,
+  });
+  return result;
+};
 
-export const getCustomerAppointment = (id) => async(dispatch) => {
+export const getCustomerAppointment = (id) => async (dispatch) => {
   const result = await axios
-    .get(`http://localhost:3001/customer/${id}`)
+    .get(`http://localhost:3001/customer/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token}
+    })
     .catch((err) => {
       return err.response;
     });
-    const data = result.data.appointment;
-    const appointmentArray = [];
-    data.forEach((value) => {
-      var newObject = {
-        startDate:value.starttime,
-        endDate:value.endtime,
-        location: 'Room 1',
-        //title:value.title,
-        //classNames:'disabled',
-        disabled: true,
-      };
-      appointmentArray.push(newObject);
+    console.log(result);
+  const data = result.data.appointment;
+  const appointmentArray = [];
+  data.forEach((value) => {
+    var location = "Room 1";
+    if (value.status === -1) return;
+    switch (value.status) {
+      case 1:
+        location = "Room 2";
+        break;
+      case 2:
+        location = "Room 3";
+        break;
+      default:
+        break;
+    }
+    var newObject = {
+      id: value.id,
+      startDate: value.starttime,
+      endDate: value.endtime,
+      location: location,
+      title: value.title,
+      classNames: "disabled",
+    };
+    appointmentArray.push(newObject);
+  });
+
+  dispatch({
+    type: GET_CUSTOMER_APPOINTMENT,
+    payload: appointmentArray,
+  });
+  return result;
+};
+
+export const updateCustomerAppointment = (object) => async (dispatch) => {
+  const result = await axios
+    .put("http://localhost:3001/appointment/", {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+      object,
     })
-    dispatch({
-      type: GET_BUSINESS_APPOINTMENT,
-      payload: appointmentArray,
+    .catch((err) => {
+      return err.response;
     });
-    return result;
-}
+  return result;
+};
+
+export const deleteAppointment = (id) => async (dispatch) => {
+  const result = await axios
+    .delete(`http://localhost:3001/appointment/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
+    .catch((err) => {
+      return err.response;
+    });
+  return result;
+};
+
+export const getBusinessAppointmentById = (id) => async (dispatch) => {
+  const result = await axios
+    .get(`http://localhost:3001/business/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
+    .catch((err) => {
+      return err.response;
+    });
+  const data = result.data.appointment;
+  const appointmentArray = [];
+  data.forEach((value) => {
+    var location = "Room 1";
+    switch (value.status) {
+      case 1:
+        location = "Room 2";
+        break;
+      case 2:
+        location = "Room 3";
+        break;
+      case -1:
+        location = "Room 4";
+        break;
+      default:
+        break;
+    }
+    var newObject = {
+      id: value.id,
+      startDate: value.starttime,
+      endDate: value.endtime,
+      location: location,
+      title: value.title,
+    };
+    appointmentArray.push(newObject);
+  });
+
+  dispatch({
+    type: GET_BUSINESS_APPOINTMENT,
+    payload: appointmentArray,
+  });
+  return result;
+};
+
+export const removeAppointment = (id) => async (dispatch) => {
+  const result = await axios
+    .put(`http://localhost:3001/appointment/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
+    .catch((err) => {
+      return err.response;
+    });
+  return result;
+};
+
+export const changeAppointment = (id) => async (dispatch) => {
+  const result = await axios
+    .post(`http://localhost:3001/appointment/${id}`, {
+      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+    })
+    .catch((err) => {
+      return err.response;
+    });
+  return result;
+};
