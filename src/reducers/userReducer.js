@@ -1,14 +1,22 @@
-import { LOGIN } from '../actions/types';
+import { LOGIN, BUSINESS_INFO_ARRAY, BUSINESS_EMAIL, GET_BUSINESS_APPOINTMENT } from '../actions/types';
 
 const initState = {
-    userInfo:{}
+    userInfo:{},
+    businessInfoArray:{},
+    businessEmail:'',
+    businessAppointment:{},
 }
 
 export default (state = initState, actions) => {
     switch(actions.type){
         case LOGIN:
-            console.log(actions.payload);
             return {...state, userInfo:actions.payload};
+        case BUSINESS_INFO_ARRAY:
+            return {...state, businessInfoArray:actions.payload}
+        case BUSINESS_EMAIL:
+            return {...state, businessEmail:actions.payload}
+        case GET_BUSINESS_APPOINTMENT:
+            return {...state, businessAppointment:actions.payload}
         default:
             return state;
     }

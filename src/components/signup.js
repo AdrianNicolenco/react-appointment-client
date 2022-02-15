@@ -61,7 +61,6 @@ const Signup = (props) => {
     };
     data.get("isBusiness") != null 
     ? await props.businessSignUp(newObject).then(res => {
-      console.log(res);
       if(res.status === 409 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
       if(res.status === 400 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
       if(res.status === 500 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
@@ -72,7 +71,6 @@ const Signup = (props) => {
 
     }) 
     : await props.customerSignUp(newObject).then(res => {
-      console.log(res)
       if(res.status === 409 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
       if(res.status === 400 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
       if(res.status === 500 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
