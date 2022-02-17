@@ -32,7 +32,7 @@ import TextField from '@mui/material/TextField';
 import Close from '@mui/icons-material/Close';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import Create from '@mui/icons-material/Create';
-
+import MyMap from './myMap';
 const PREFIX = 'Demo';
 const classes = {
   content: `${PREFIX}-content`,
@@ -196,7 +196,9 @@ class AppointmentFormContainerBasic extends React.PureComponent {
       cancelAppointment();
     };
 
+    if(!isNewAppointment){
     return (
+      
       <AppointmentForm.Overlay
         visible={visible}
         target={target}
@@ -235,6 +237,11 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                 />
               </LocalizationProvider>
             </div>
+            <div>
+              {appointmentData.position &&
+                <MyMap location={JSON.parse(appointmentData.position)} />
+              }
+            </div>
           </div>
           <div className={classes.buttonGroup}>
             {!isNewAppointment && (
@@ -257,9 +264,11 @@ class AppointmentFormContainerBasic extends React.PureComponent {
               color="primary"
               className={classes.button}
               onClick={() => {
-                postCommitChange('save', displayAppointmentData);
-                visibleChange();
-                applyChanges();
+                if(postCommitChange('save', displayAppointmentData) === true){
+                  visibleChange();
+                  applyChanges();
+                }
+                else{ visibleChange() }
               }}
             >
               {isNewAppointment ? 'Create' : 'Save'}
@@ -267,17 +276,21 @@ class AppointmentFormContainerBasic extends React.PureComponent {
           </div>
         </StyledDiv>
       </AppointmentForm.Overlay>
-    );
+    )}
+    else{
+      return (<div></div>)
+    }
   }
 }
 
 /* eslint-disable-next-line react/no-multi-comp */
-export default class Demo extends React.PureComponent {
+export default class Demo extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: props.data,
-      currentDate: `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,
+      prevdata: props.data,
+      currentDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
       editingFormVisible: false,
       deletedAppointmentId: undefined,
       editingAppointment: undefined,
@@ -299,12 +312,11 @@ export default class Demo extends React.PureComponent {
             { id: 'Room 5', },
           ],
         },
-      ]   
+      ]
     };
-
     this.commitDeletedAppointment = this.commitDeletedAppointment.bind(this);
     this.toggleEditingFormVisibility = this.toggleEditingFormVisibility.bind(this);
-    
+
     this.commitChanges = this.commitChanges.bind(this);
     this.onEditingAppointmentChange = this.onEditingAppointmentChange.bind(this);
     this.onAddedAppointmentChange = this.onAddedAppointmentChange.bind(this);
@@ -337,15 +349,23 @@ export default class Demo extends React.PureComponent {
         postCommitChange: this.props.postCommitChange,
         visibleChange: this.toggleEditingFormVisibility,
         onEditingAppointmentChange: this.onEditingAppointmentChange,
-        commitDeletedAppointment:this.commitDeletedAppointment,
+        commitDeletedAppointment: this.commitDeletedAppointment,
         cancelAppointment,
       };
     });
   }
 
-  componentDidUpdate() {
+  shouldComponentUpdate(nextProps){
+    if(nextProps.data !== this.state.prevdata){
+      this.setState({data: nextProps.data, prevdata: nextProps.data})
+    } 
+    
+    return true;
+  }
+  componentDidUpdate(props) {
     this.appointmentForm.update();
   }
+  
 
   onEditingAppointmentChange(editingAppointment) {
     this.setState({ editingAppointment });
@@ -374,7 +394,7 @@ export default class Demo extends React.PureComponent {
   }
 
   commitDeletedAppointment() {
-    
+
     this.setState((state) => {
       const { data, deletedAppointmentId } = state;
       const nextData = data.filter(appointment => appointment.id !== deletedAppointmentId);
@@ -414,63 +434,64 @@ export default class Demo extends React.PureComponent {
 
     return (
       <React.Fragment>
-      <Paper>
+        <Paper>
 
-        <Scheduler
-          data={data}
-          height={660}
-        >
-          <ViewState
-            defaultCurrentDate={currentDate}
-          />
-          
-          <EditingState
-            onCommitChanges={this.commitChanges}
-            onEditingAppointmentChange={this.onEditingAppointmentChange}
-            onAddedAppointmentChange={this.onAddedAppointmentChange}
-          />
+          <Scheduler
+            data={data}
+            height={660}
+          >
+            <ViewState
+              defaultCurrentDate={currentDate}
+            />
 
-          <WeekView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-          />
-           <DayView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-          />
-          <MonthView />
-          <EditRecurrenceMenu />
-          <Appointments />
-          <AppointmentTooltip
-            showOpenButton
-            showCloseButton
-          />
-          <Resources
+            <EditingState
+              onCommitChanges={this.commitChanges}
+              onEditingAppointmentChange={this.onEditingAppointmentChange}
+              onAddedAppointmentChange={this.onAddedAppointmentChange}
+            />
+
+            <WeekView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+            />
+            <DayView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+            />
+            <MonthView />
+            <EditRecurrenceMenu />
+            <Appointments 
+            />
+            <AppointmentTooltip
+              showOpenButton
+              showCloseButton
+            />
+            <Resources
               data={resources}
               mainResourceName={mainResourceName}
             />
-          <Toolbar />
-          <DateNavigator />
-          <TodayButton />
-          <ViewSwitcher />
-          <AppointmentForm
-            overlayComponent={this.appointmentForm}
-            visible={editingFormVisible}
-            onVisibilityChange={this.toggleEditingFormVisibility}
-          />
-          <DragDropProvider />
-        </Scheduler>
-
-        <StyledFab
-          color="secondary"
-          className={classes.addButton}
-          onClick={() => {
-            this.props.addFunc();
-          }}
-        >
-          <AddIcon />
-        </StyledFab>
-      </Paper>
+            <Toolbar />
+            <DateNavigator />
+            <TodayButton />
+            <ViewSwitcher />
+            <AppointmentForm
+              readOnly={true}
+              overlayComponent={this.appointmentForm}
+              visible={editingFormVisible}
+              onVisibilityChange={this.toggleEditingFormVisibility}
+            />
+            <DragDropProvider />
+          </Scheduler>
+          <StyledFab
+            color="secondary"
+            className={classes.addButton}
+            onClick={() => {
+              this.props.addFunc();
+            }}
+          >
+            <AddIcon />
+          </StyledFab>
+        </Paper>
       </React.Fragment>
     );
   }

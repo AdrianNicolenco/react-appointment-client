@@ -31,6 +31,7 @@ import TextField from '@mui/material/TextField';
 import Close from '@mui/icons-material/Close';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import Create from '@mui/icons-material/Create';
+import MyMap from '../myMap';
 
 const PREFIX = 'Demo';
 const classes = {
@@ -86,6 +87,7 @@ const StyledDiv = styled('div')(({ theme }) => ({
     marginLeft: theme.spacing(2),
   },
 }));
+
 const StyledFab = styled(Fab)(({ theme }) => ({
   [`&.${classes.addButton}`]: {
     position: 'absolute',
@@ -233,6 +235,11 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                 />
               </LocalizationProvider>
             </div>
+            <div>
+              {appointmentData.position &&
+                <MyMap location={JSON.parse(appointmentData.position)} />
+              }
+            </div>
           </div>
           <div className={classes.buttonGroup}>
             {!isNewAppointment && (
@@ -275,7 +282,7 @@ export default class Demo extends React.PureComponent {
     super(props);
     this.state = {
       data: props.data,
-      currentDate: `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,
+      currentDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
       confirmationVisible: false,
       editingFormVisible: false,
       deletedAppointmentId: undefined,
@@ -298,7 +305,7 @@ export default class Demo extends React.PureComponent {
             { id: 'Room 5', },
           ],
         },
-      ]   
+      ]
     };
 
     this.toggleConfirmationVisible = this.toggleConfirmationVisible.bind(this);
@@ -419,59 +426,59 @@ export default class Demo extends React.PureComponent {
 
     return (
       <React.Fragment>
-      <Paper>
+        <Paper>
 
-        <Scheduler
-          data={data}
-          height={660}
-        >
-          <ViewState
-            defaultCurrentDate={currentDate}
-          />
-          
-          <EditingState
-            onCommitChanges={this.commitChanges}
-            onEditingAppointmentChange={this.onEditingAppointmentChange}
-            onAddedAppointmentChange={this.onAddedAppointmentChange}
-          />
-
-          <WeekView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-            onDoubleClick={undefined}
+          <Scheduler
+            data={data}
+            height={660}
           >
-            <WeekView.TimeTableCell
-              onDoubleClick={undefined}
+            <ViewState
+              defaultCurrentDate={currentDate}
             />
+
+            <EditingState
+              onCommitChanges={this.commitChanges}
+              onEditingAppointmentChange={this.onEditingAppointmentChange}
+              onAddedAppointmentChange={this.onAddedAppointmentChange}
+            />
+
+            <WeekView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+              onDoubleClick={undefined}
+            >
+              <WeekView.TimeTableCell
+                onDoubleClick={undefined}
+              />
             </WeekView>
-          
-           <DayView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-          />
-          <MonthView />
-          <EditRecurrenceMenu />
-          <Appointments />
-          <AppointmentTooltip
-            showOpenButton
-            showCloseButton
-          />
-          <Resources
+
+            <DayView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+            />
+            <MonthView />
+            <EditRecurrenceMenu />
+            <Appointments />
+            <AppointmentTooltip
+              showOpenButton
+              showCloseButton
+            />
+            <Resources
               data={resources}
               mainResourceName={mainResourceName}
             />
-          <Toolbar />
-          <DateNavigator />
-          <TodayButton />
-          <ViewSwitcher />
-          <AppointmentForm
-            overlayComponent={this.appointmentForm}
-            visible={editingFormVisible}
-            onVisibilityChange={this.toggleEditingFormVisibility}
-          />
-          <DragDropProvider />
-        </Scheduler>
-      </Paper>
+            <Toolbar />
+            <DateNavigator />
+            <TodayButton />
+            <ViewSwitcher />
+            <AppointmentForm
+              overlayComponent={this.appointmentForm}
+              visible={editingFormVisible}
+              onVisibilityChange={this.toggleEditingFormVisibility}
+            />
+            <DragDropProvider />
+          </Scheduler>
+        </Paper>
       </React.Fragment>
     );
   }

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
- 
 import { ViewState, EditingState, } from '@devexpress/dx-react-scheduler';
 import {
   Resources,
@@ -17,6 +16,7 @@ import {
   DateNavigator,
   TodayButton,
 } from '@devexpress/dx-react-scheduler-material-ui';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { connectProps } from '@devexpress/dx-react-core';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -30,6 +30,9 @@ import LocationOn from '@mui/icons-material/LocationOn';
 import Close from '@mui/icons-material/Close';
 import CalendarToday from '@mui/icons-material/CalendarToday';
 import Create from '@mui/icons-material/Create';
+import ReactMapGL, { Marker } from "react-map-gl";
+import Room from "@mui/icons-material/Room";
+import MyMap from '../myMap';
 
 const PREFIX = 'Demo';
 
@@ -100,6 +103,13 @@ class AppointmentFormContainerBasic extends React.PureComponent {
 
     this.state = {
       appointmentChanges: {},
+      viewport: {
+        width: "100%",
+        height: "500px",
+        latitude: 37.7577,
+        longitude: 35.4376,
+        zoom: 10,
+      },
     };
 
     this.getAppointmentData = () => {
@@ -107,10 +117,15 @@ class AppointmentFormContainerBasic extends React.PureComponent {
       return appointmentData;
     };
     this.getAppointmentChanges = () => {
-      
+
       const { appointmentChanges } = this.state;
       return appointmentChanges;
     };
+
+    this.getViewport = () => {
+      const { viewport } = this.state;
+      return viewport;
+    }
 
     this.changeAppointment = this.changeAppointment.bind(this);
     this.commitAppointment = this.commitAppointment.bind(this);
@@ -217,7 +232,7 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                   {...startDatePickerProps}
                   disabled={true}
                 />
-                
+
                 <DateTimePicker
                   label="End Date"
                   renderInput={
@@ -228,11 +243,8 @@ class AppointmentFormContainerBasic extends React.PureComponent {
                 />
               </LocalizationProvider>
             </div>
-            <div className={classes.wrapper}>
-              <LocationOn className={classes.icon} color="action" />
-              <TextField
-                {...textEditorProps('location')}
-              />
+            <div>
+              <MyMap />
             </div>
           </div>
           <div className={classes.buttonGroup}>
@@ -241,10 +253,11 @@ class AppointmentFormContainerBasic extends React.PureComponent {
               color="primary"
               className={classes.button}
               onClick={() => {
-                const {addFunc} = this.props;
-                addFunc(displayAppointmentData);
-                visibleChange();
-                applyChanges();
+                const { addFunc } = this.props;
+                if (addFunc(displayAppointmentData) === true){
+                  visibleChange();
+                  applyChanges();
+                }
               }}
             >
               Create
@@ -258,12 +271,12 @@ class AppointmentFormContainerBasic extends React.PureComponent {
 
 /* eslint-disable-next-line react/no-multi-comp */
 export default class AddCalendar extends React.PureComponent {
-  
+
   constructor(props) {
     super(props);
     this.state = {
       data: props.data,
-      currentDate: `${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`,
+      currentDate: `${new Date().getFullYear()}-${new Date().getMonth() + 1}-${new Date().getDate()}`,
       confirmationVisible: false,
       editingFormVisible: false,
       deletedAppointmentId: undefined,
@@ -286,7 +299,7 @@ export default class AddCalendar extends React.PureComponent {
             { id: 'Room 5', text: 'Room 5' },
           ],
         },
-      ]     
+      ]
     }
 
     this.toggleConfirmationVisible = this.toggleConfirmationVisible.bind(this);
@@ -328,7 +341,7 @@ export default class AddCalendar extends React.PureComponent {
         cancelAppointment,
       };
     });
-  
+
 
   }
   componentDidUpdate() {
@@ -365,14 +378,14 @@ export default class AddCalendar extends React.PureComponent {
   commitChanges({ added }) {
     this.setState((state) => {
       let { data } = state;
-      data = [...data, {...added }];
+      data = [...data, { ...added }];
       return { data, addedAppointment: {} };
     });
   }
-  onAppointmentUpdating(e){
+  onAppointmentUpdating(e) {
     console.log("SDF");
   }
-  
+
   render() {
     const {
       currentDate,
@@ -386,60 +399,60 @@ export default class AddCalendar extends React.PureComponent {
 
     return (
       <React.Fragment>
-      
-      <Paper>
-        <Scheduler
-          data={data}
-          height={660}
-        >
-          
-          <ViewState
-            defaultCurrentDate={currentDate}
-          />
-          <EditingState
-            onCommitChanges={this.commitChanges}
-            onEditingAppointmentChange={this.onEditingAppointmentChange}
-            onAddedAppointmentChange={this.onAddedAppointmentChange}
-          />
-          <WeekView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-          />
-          <DayView
-            startDayHour={startDayHour}
-            endDayHour={endDayHour}
-          />
-          <MonthView />
-          <Appointments 
-            
-          />
-          <AppointmentTooltip
-            showCloseButton
-          />
-          <Resources
+
+        <Paper>
+          <Scheduler
+            data={data}
+            height={660}
+          >
+
+            <ViewState
+              defaultCurrentDate={currentDate}
+            />
+            <EditingState
+              onCommitChanges={this.commitChanges}
+              onEditingAppointmentChange={this.onEditingAppointmentChange}
+              onAddedAppointmentChange={this.onAddedAppointmentChange}
+            />
+            <WeekView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+            />
+            <DayView
+              startDayHour={startDayHour}
+              endDayHour={endDayHour}
+            />
+            <MonthView />
+            <Appointments
+
+            />
+            <AppointmentTooltip
+              showCloseButton
+            />
+            <Resources
               data={resources}
               mainResourceName={mainResourceName}
             />
-          <Toolbar />
-          <DateNavigator />
-          <TodayButton />
-          <ViewSwitcher />
-          <AppointmentForm
-            overlayComponent={this.appointmentForm}
-            visible={editingFormVisible}
-            onVisibilityChange={this.toggleEditingFormVisibility}
-          />
-        </Scheduler>
-        <StyledFab
-          color="secondary"
-          className={classes.addButton}
-          onClick={() => {
-            this.props.retFunc();
-          }}
-        >
-          <AddIcon />
-        </StyledFab>
-      </Paper>
+            <Toolbar />
+            <DateNavigator />
+            <TodayButton />
+            <ViewSwitcher />
+            <AppointmentForm
+              overlayComponent={this.appointmentForm}
+              visible={editingFormVisible}
+              onVisibilityChange={this.toggleEditingFormVisibility}
+            />
+          </Scheduler>
+          <StyledFab
+            color="secondary"
+            className={classes.addButton}
+            onClick={() => {
+              this.props.retFunc();
+            }}
+          >
+            <ArrowBackIcon />
+          </StyledFab>
+        </Paper>
       </React.Fragment>
     );
   }

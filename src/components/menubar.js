@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -46,59 +46,59 @@ const Menubar = (props) => {
   const [userInfo, setUserInfo] = useState("");
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  
-  useEffect(async() => {
+
+  useEffect(async () => {
     const res = await props.getBusinessInfoArray();
-    if(res.status === 403 || res.status === 401 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
-    console.log(res);
+    if (res.status === 403 || res.status === 401) enqueueSnackbar(res.data, { variant: 'warning', autoHideDuration: 1000 })
     setUserInfo(JSON.parse(localStorage.getItem("userInfo")).dataValues.name)
   }, []);
 
   const logout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('cityinfo');
     navigate('/');
   }
 
   return (
     <MuiAppBar position="fixed">
-       
-        <Toolbar
-          sx={{
-            pr: "24px",
-          }}
+
+      <Toolbar
+        sx={{
+          pr: "24px",
+        }}
+      >
+        {userInfo !== '' && <Avatar {...stringAvatar(userInfo)} />}
+        <Typography
+          component="h1"
+          variant="h6"
+          color="inherit"
+          noWrap
+          sx={{ flexGrow: 1, marginLeft: '20px' }}
+
         >
-         {userInfo !== '' && <Avatar {...stringAvatar(userInfo)} />}
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            sx={{ flexGrow: 1, marginLeft:'20px' }}
-            
-          >
-            {userInfo}
-          </Typography>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
-          <IconButton onClick={logout} color="inherit" sx={{marginX: '1rem'}}>
+          {userInfo}
+        </Typography>
+        <IconButton color="inherit">
+          <Badge badgeContent={4} color="secondary">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <IconButton onClick={logout} color="inherit" sx={{ marginX: '1rem' }}>
           <Badge color="secondary">
-              <LogoutIcon />
-            </Badge>
-          </IconButton>
-          
-        </Toolbar>
-      </MuiAppBar>
+            <LogoutIcon />
+          </Badge>
+        </IconButton>
+
+      </Toolbar>
+    </MuiAppBar>
   )
 }
 
 Menubar.propTypes = {
-    getBusinessInfoArray: PropTypes.func.isRequired,
+  getBusinessInfoArray: PropTypes.func.isRequired,
 };
 const mapStateToProps = state => ({
-    userInfo: state.UserReducerState.userInfo,
+  userInfo: state.UserReducerState.userInfo,
 })
 
 export default connect(mapStateToProps, { getBusinessInfoArray })(Menubar);

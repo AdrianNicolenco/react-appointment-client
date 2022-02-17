@@ -26,29 +26,33 @@ const Login = (props) => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const newObject = {
       email: data.get("email"),
       password: data.get("password")
     }
-    data.get("isBusiness") != null 
-    ? await props.businessLogin(newObject).then(res => {
-      if(res.status === 400 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
-      if(res.status === 200 ) {enqueueSnackbar("Successfully Login", {variant: 'success', autoHideDuration: 1000})
-      setTimeout(()=>{
-        navigate('/business');
-      },2000) }
+    data.get("isBusiness") != null
+      ? await props.businessLogin(newObject).then(res => {
+        if (res.status === 400) enqueueSnackbar(res.data, { variant: 'warning', autoHideDuration: 1000 })
+        if (res.status === 200) {
+          enqueueSnackbar("Successfully Login", { variant: 'success', autoHideDuration: 1000 })
+          setTimeout(() => {
+            navigate('/business');
+          }, 2000)
+        }
 
-    }) 
-    : await props.customerLogin(newObject).then(res => {
-      if(res.status === 400 ) enqueueSnackbar(res.data, {variant: 'warning', autoHideDuration: 1000})
-      if(res.status === 200 ) {enqueueSnackbar("Successfully Login", {variant: 'success', autoHideDuration: 1000})
-      setTimeout(()=>{
-        navigate('/customer');
-      },2000) }
-    });
+      })
+      : await props.customerLogin(newObject).then(res => {
+        if (res.status === 400) enqueueSnackbar(res.data, { variant: 'warning', autoHideDuration: 1000 })
+        if (res.status === 200) {
+          enqueueSnackbar("Successfully Login", { variant: 'success', autoHideDuration: 1000 })
+          setTimeout(() => {
+            navigate('/customer');
+          }, 2000)
+        }
+      });
   };
   return (
     <ThemeProvider theme={theme}>
@@ -144,4 +148,4 @@ Login.propTypes = {
   businessLogin: PropTypes.func.isRequired,
 }
 
-export default connect(null, {customerLogin, businessLogin})(Login);
+export default connect(null, { customerLogin, businessLogin })(Login);

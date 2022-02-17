@@ -30,7 +30,6 @@ export const businessSignUp = (object) => async (dispatch) => {
 };
 
 export const customerLogin = (object) => async (dispatch) => {
-  console.log(object);
   const result = await axios
     .post("http://localhost:3001/customer/login", {
       object,
@@ -62,15 +61,14 @@ export const businessLogin = (object) => async (dispatch) => {
   return result;
 };
 
-export const getBusinessInfoArray = (object) => async (dispatch) => {
+export const getBusinessInfoArray = () => async (dispatch) => {
   const result = await axios
     .get("http://localhost:3001/business/", {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
     });
-    console.log(result);
   dispatch({
     type: BUSINESS_INFO_ARRAY,
     payload: result.data,
@@ -87,9 +85,8 @@ export const setBusinessEmail = (email) => (dispatch) => {
 
 export const postAppointments = (object) => async (dispatch) => {
   const result = await axios
-    .post("http://localhost:3001/appointment/", {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
-      object,
+    .post("http://localhost:3001/appointment/", { object }, {
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
@@ -100,7 +97,7 @@ export const postAppointments = (object) => async (dispatch) => {
 export const getBusinessAppointment = (id) => async (dispatch) => {
   const result = await axios
     .get(`http://localhost:3001/business/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
@@ -128,12 +125,11 @@ export const getBusinessAppointment = (id) => async (dispatch) => {
 export const getCustomerAppointment = (id) => async (dispatch) => {
   const result = await axios
     .get(`http://localhost:3001/customer/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token}
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token }
     })
     .catch((err) => {
       return err.response;
     });
-    console.log(result);
   const data = result.data.appointment;
   const appointmentArray = [];
   data.forEach((value) => {
@@ -154,6 +150,7 @@ export const getCustomerAppointment = (id) => async (dispatch) => {
       startDate: value.starttime,
       endDate: value.endtime,
       location: location,
+      position: value.location,
       title: value.title,
       classNames: "disabled",
     };
@@ -164,14 +161,13 @@ export const getCustomerAppointment = (id) => async (dispatch) => {
     type: GET_CUSTOMER_APPOINTMENT,
     payload: appointmentArray,
   });
-  return result;
+  return appointmentArray;
 };
 
 export const updateCustomerAppointment = (object) => async (dispatch) => {
   const result = await axios
-    .put("http://localhost:3001/appointment/", {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
-      object,
+    .put("http://localhost:3001/appointment/", { object }, {
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
@@ -182,7 +178,7 @@ export const updateCustomerAppointment = (object) => async (dispatch) => {
 export const deleteAppointment = (id) => async (dispatch) => {
   const result = await axios
     .delete(`http://localhost:3001/appointment/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
@@ -193,7 +189,7 @@ export const deleteAppointment = (id) => async (dispatch) => {
 export const getBusinessAppointmentById = (id) => async (dispatch) => {
   const result = await axios
     .get(`http://localhost:3001/business/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
+      headers: { authorization: JSON.parse(localStorage.getItem("userInfo")).token },
     })
     .catch((err) => {
       return err.response;
@@ -220,6 +216,7 @@ export const getBusinessAppointmentById = (id) => async (dispatch) => {
       startDate: value.starttime,
       endDate: value.endtime,
       location: location,
+      position: value.location,
       title: value.title,
     };
     appointmentArray.push(newObject);
@@ -234,9 +231,7 @@ export const getBusinessAppointmentById = (id) => async (dispatch) => {
 
 export const removeAppointment = (id) => async (dispatch) => {
   const result = await axios
-    .put(`http://localhost:3001/appointment/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
-    })
+    .put(`http://localhost:3001/appointment/${id}`)
     .catch((err) => {
       return err.response;
     });
@@ -245,9 +240,7 @@ export const removeAppointment = (id) => async (dispatch) => {
 
 export const changeAppointment = (id) => async (dispatch) => {
   const result = await axios
-    .post(`http://localhost:3001/appointment/${id}`, {
-      headers: {authorization:JSON.parse(localStorage.getItem("userInfo")).token},
-    })
+    .post(`http://localhost:3001/appointment/${id}`)
     .catch((err) => {
       return err.response;
     });
